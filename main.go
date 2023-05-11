@@ -1,9 +1,14 @@
 package main
 
 import (
-    "net/http"
-    "github.com/gin-gonic/gin"
-    //"errors"
+	"fmt"
+	"log"
+	"net/http"
+	"os"
+
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+	//"errors"
 )
 
 type user struct{
@@ -21,6 +26,11 @@ func getUsers(c *gin.Context){
 }
 
 func main(){
+    err := godotenv.Load()
+    if err != nil {
+        log.Fatal("Error loading .env file")
+    }
+    fmt.Printf("mysql connection: %s \n", os.Getenv("MYSQL"))
     router := gin.Default()
     router.GET("/users", getUsers)
     router.Run("localhost:8080")

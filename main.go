@@ -15,13 +15,13 @@ import (
 
 type user struct{
     ID int `json:"id"`
-    Name string `json:"name"`
+    UserName string `json:"user_name"`
     Email string `json:"email"`
 }
 
 var test_users = []user{
-    {ID:1, Name:"aa", Email:"aa@gmail.com"},
-    {ID:2, Name:"ab", Email:"ab@gmail.com"},
+    {ID:1, UserName:"aa", Email:"aa@gmail.com"},
+    {ID:2, UserName:"ab", Email:"ab@gmail.com"},
 }
 
 var db_users []user
@@ -34,6 +34,10 @@ func getUsers(c *gin.Context){
         fmt.Printf("\033[33mGetting users from mysql database!\033[0m\n")
         c.IndentedJSON(http.StatusOK, db_users)
     }
+}
+
+func addUser(c *gin.Context){
+    fmt.Printf("add user")
 }
 
 func main(){
@@ -58,19 +62,20 @@ func main(){
         log.Fatal(pingErr)
     }
     fmt.Printf("\033[36mDB Connected!\033[0m\n")
-    rows, err := db.Query("SELECT * FROM users")
+    rows, err := db.Query("SELECT id, user_name, email FROM users")
     if err != nil {
         log.Fatal("\033[31mQuery Error!\033[31m\n")
     }
     defer rows.Close()
     for rows.Next() {
         var p user
-        if err := rows.Scan(&p.ID,&p.Name,&p.Email); err != nil {
+        if err := rows.Scan(&p.ID,&p.UserName,&p.Email); err != nil {
             log.Fatal("\033[31mScaning Row Error!\033[31m\n")
         }
         db_users = append(db_users, p)
     }
     router := gin.Default()
     router.GET("/users", getUsers)
+    router.POST("/add_user", addUser)
     router.Run("localhost:8080")
 }
